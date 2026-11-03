@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# Quiet status board for Claude Code sessions running in tmux.
+#
+#   claude-tasks              open the picker (meant for: tmux display-popup -E)
+#   claude-tasks hook EVENT   record a hook event (Claude Code hook JSON on stdin)
+#   claude-tasks list         print sessions (used by the picker)
+#   claude-tasks clear PANE   mark a session seen (any status -> idle)
+#   claude-tasks jump PANE    switch the current tmux client to that pane
+#
+# State: one file per tmux pane in $CLAUDE_TASKS_DIR (default
+# $XDG_STATE_HOME/claude-tasks), holding "status<TAB>epoch<TAB>cwd".
+# Files for panes that no longer exist are pruned.
+
+state="${CLAUDE_TASKS_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/claude-tasks}"
+mkdir -p "$state"
+self="$(realpath "$0")"
+
+set_status() { # pane status [cwd]
+    local file="$state/${1#%}" cwd="$3"
+    [[ -z "$cwd" && -f "$file" ]] && cwd="$(cut -f3 "$file")"
+    printf '%s\t%s\t%s\n' "$2" "$(date +%s)" "$cwd" >"$file"
+}
+
+hook() {
+    [[ -z "$TMUX_PANE" ]] && exit 0
+    local input cwd file="$state/${TMUX_PANE#%}"
+    input="$(cat)"
+    cwd="$(jq -r '.cwd // empty' <<<"$input" 2>/dev/null)"
+    case "$1" in
+        SessionStart) set_status "$TMUX_PANE" idle "$cwd" ;;
+        UserPromptSubmit) set_status "$TMUX_PANE" running "$cwd" ;;
+        Stop) set_status "$TMUX_PANE" done "$cwd" ;;
+        SessionEnd) rm -f "$file" ;;
+        Notification)
+            # Only real "needs you" prompts; ignore the idle reminder after a reply.
+            case "$(jq -r '.notification_type // empty' <<<"$input")" in
+                permission_prompt | elicitation_dialog) set_status "$TMUX_PANE" waiting "$cwd" ;;
+            esac
+            ;;
+        PostToolUse)
+            # A tool ran, so a pending permission prompt was answered.
+            [[ "$(cut -f1 "$file" 2>/dev/null)" == waiting ]] && set_status "$TMUX_PANE" running "$cwd"
+            ;;
+    esac
+    exit 0
+}
+
+ago() {
+    local s=$(($(date +%s) - $1))
+    if ((s < 60)); then echo "${s}s"
+    elif ((s < 3600)); then echo "$((s / 60))m"
+    elif ((s < 86400)); then echo "$((s / 3600))h"
+    else echo "$((s / 86400))d"
+    fi
+}
+
+list() {
+    local panes file id status epoch cwd target title rank icon color
+    panes="$(tmux list-panes -a -F '#{pane_id}')"
+    for file in "$state"/*; do
+        [[ -f "$file" ]] || continue
+        id="%${file##*/}"
+        if ! grep -qx -- "$id" <<<"$panes"; then
+            rm -f "$file"
+            continue
+        fi
+        IFS=$'\t' read -r status epoch cwd <"$file"
+        IFS=$'\t' read -r target title <<<"$(tmux display -p -t "$id" $'#S:#I.#P\t#{pane_title}')"
+        # Claude Code sets the pane title to a session summary, e.g. "✳ Fix login bug".
+        [[ "$title" =~ ^[^[:alnum:][:space:]]+[[:space:]]+(.*)$ ]] && title="${BASH_REMATCH[1]}"
+        [[ -z "$title" || "$title" == "$(hostname)" ]] && title="${cwd##*/}"
+        case "$status" in
+            waiting) rank=0 icon="?" color=31 ;;
+            done) rank=1 icon="●" color=32 ;;
+            running) rank=2 icon="◐" color=33 ;;
+            *) rank=3 icon="○" color=90 ;;
+        esac
+        printf '%s\t%s\t%s\t\e[%sm%s %-7s\e[0m  %-36.36s  \e[36m%-24.24s\e[0m \e[90m%-14.14s %4s\e[0m\n' \
+            "$rank" "$epoch" "$id" "$color" "$icon" "$status" "$title" "$target" "${cwd##*/}" "$(ago "$epoch")"
+    done | sort -t$'\t' -k1,1n -k2,2nr | cut -f3-
+}
+
+jump() {
+    tmux switch-client -t "$1" \; select-window -t "$1" \; select-pane -t "$1"
+}
+
+ui() {
+    # fzf has no key chords, so "dd" keeps state in the (hidden) prompt: the first
+    # d sets it to "d> ", a second d clears the entry, any other key resets it.
+    local keys="j,k,g,G,d,r,q,/"
+    local reset="change-prompt(> )"
+    local normal="rebind($keys)+hide-input+clear-query+$reset"
+    local dd="[[ \$FZF_PROMPT == 'd> ' ]] && echo '$reset+execute-silent($self clear {1})+reload($self list)' || echo 'change-prompt(d> )'"
+    "$self" list | fzf --ansi --no-sort --no-input --delimiter=$'\t' --with-nth=2 \
+        --layout=reverse --border=rounded --border-label=" Claude sessions " \
+        --header="j/k move · g/G top/bottom · Enter jump · dd clear · r refresh · / filter · q quit" \
+        --header-first --info=hidden --pointer="▌" --gutter=" " --prompt="> " \
+        --bind="j:down+$reset,k:up+$reset,g:first+$reset,G:last+$reset,q:abort" \
+        --bind="enter:execute-silent($self jump {1})+abort" \
+        --bind="d:transform:$dd" \
+        --bind="r:reload($self list)+$reset" \
+        --bind="/:show-input+unbind($keys)+$reset" \
+        --bind="esc:transform:[[ \$FZF_INPUT_STATE == hidden ]] && echo abort || echo '$normal'"
+}
+
+case "$1" in
+    hook) hook "$2" ;;
+    list) list ;;
+    clear)
+        f="$state/${2#%}"
+        [[ -f "$f" ]] && set_status "$2" idle
+        ;;
+    jump) jump "$2" ;;
+    "") ui ;;
+    *) sed -n '2,9s/^# \{0,1\}//p' "$self" >&2; exit 1 ;;
+esac
