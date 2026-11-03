@@ -54,10 +54,11 @@ straight to the pane.
 
    ```tmux
    bind C-i display-popup -E -w 104 -h 60% "~/.local/bin/claude-tasks"
+   bind Tab display-popup -E -w 104 -h 60% "~/.local/bin/claude-tasks"
    ```
 
-   Terminals send `C-i` as `Tab`, so this also takes over `prefix + Tab`. Pick another key if
-   you use that.
+   Terminals send `C-i` as `Tab` unless tmux `extended-keys` is on, so both are bound. This
+   replaces tmux's default `prefix + Tab`; pick another key if you use that.
 
 ## Usage
 
