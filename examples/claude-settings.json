@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "~/.local/bin/claude-tasks hook SessionStart" }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "~/.local/bin/claude-tasks hook UserPromptSubmit" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "~/.local/bin/claude-tasks hook Stop" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "~/.local/bin/claude-tasks hook SessionEnd" }] }
+    ],
+    "PostToolUse": [
+      { "hooks": [{ "type": "command", "command": "~/.local/bin/claude-tasks hook PostToolUse" }] }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|elicitation_dialog",
+        "hooks": [{ "type": "command", "command": "~/.local/bin/claude-tasks hook Notification" }]
+      }
+    ]
+  }
+}
