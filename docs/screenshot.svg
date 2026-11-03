@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="906" height="230" viewBox="0 0 906 230">
+<rect width="100%" height="100%" rx="8" fill="#1e1e2e"/>
+<g font-family="JetBrains Mono, Menlo, Consolas, monospace" font-size="14" xml:space="preserve">
+<text x="16.0" y="29" fill="#5f5f5f" textLength="361.2">╭──────────────────────────────────────────</text>
+<text x="377.2" y="29" fill="#afafaf" textLength="142.8"> Claude sessions </text>
+<text x="520.0" y="29" fill="#5f5f5f" textLength="369.6">───────────────────────────────────────────╮</text>
+<text x="16.0" y="47" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="47" fill="#cdd6f4" textLength="16.8">  </text>
+<text x="49.6" y="47" fill="#87afaf" textLength="680.4">j/k move · g/G top/bottom · Enter jump · dd clear · r refresh · / filter · q quit</text>
+<text x="730.0" y="47" fill="#cdd6f4" textLength="151.2">                  </text>
+<text x="881.2" y="47" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="65" fill="#cdd6f4" textLength="16.8">│ </text>
+<rect x="32.8" y="52" width="8.4" height="18" fill="#303030"/>
+<text x="32.8" y="65" fill="#d7005f" font-weight="bold" textLength="8.4">▌</text>
+<rect x="41.2" y="52" width="8.4" height="18" fill="#303030"/>
+<text x="41.2" y="65" fill="#cdd6f4" textLength="8.4"> </text>
+<rect x="49.6" y="52" width="75.6" height="18" fill="#303030"/>
+<text x="49.6" y="65" fill="#f38ba8" font-weight="bold" textLength="75.6">? waiting</text>
+<rect x="125.2" y="52" width="336.0" height="18" fill="#303030"/>
+<text x="125.2" y="65" fill="#e4e4e4" font-weight="bold" textLength="336.0">  Fix flaky checkout e2e test           </text>
+<rect x="461.2" y="52" width="201.6" height="18" fill="#303030"/>
+<text x="461.2" y="65" fill="#94e2d5" font-weight="bold" textLength="201.6">webshop:1.1             </text>
+<rect x="662.8" y="52" width="8.4" height="18" fill="#303030"/>
+<text x="662.8" y="65" fill="#e4e4e4" font-weight="bold" textLength="8.4"> </text>
+<rect x="671.2" y="52" width="159.6" height="18" fill="#303030"/>
+<text x="671.2" y="65" fill="#7f849c" font-weight="bold" textLength="159.6">webshop         40s</text>
+<text x="830.8" y="65" fill="#cdd6f4" textLength="50.4">      </text>
+<text x="881.2" y="65" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="83" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="83" fill="#303030" textLength="8.4"> </text>
+<text x="41.2" y="83" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="49.6" y="83" fill="#a6e3a1" textLength="75.6">● done   </text>
+<text x="125.2" y="83" fill="#cdd6f4" textLength="336.0">  Add rate limiting to /login           </text>
+<text x="461.2" y="83" fill="#94e2d5" textLength="201.6">api:1.1                 </text>
+<text x="662.8" y="83" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="671.2" y="83" fill="#7f849c" textLength="159.6">api              3m</text>
+<text x="830.8" y="83" fill="#cdd6f4" textLength="50.4">      </text>
+<text x="881.2" y="83" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="101" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="101" fill="#303030" textLength="8.4"> </text>
+<text x="41.2" y="101" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="49.6" y="101" fill="#a6e3a1" textLength="75.6">● done   </text>
+<text x="125.2" y="101" fill="#cdd6f4" textLength="336.0">  Migrate nvim config to lazy.nvim      </text>
+<text x="461.2" y="101" fill="#94e2d5" textLength="201.6">dotfiles:1.1            </text>
+<text x="662.8" y="101" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="671.2" y="101" fill="#7f849c" textLength="159.6">dotfiles         1h</text>
+<text x="830.8" y="101" fill="#cdd6f4" textLength="50.4">      </text>
+<text x="881.2" y="101" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="119" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="119" fill="#303030" textLength="8.4"> </text>
+<text x="41.2" y="119" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="49.6" y="119" fill="#f9e2af" textLength="75.6">◐ running</text>
+<text x="125.2" y="119" fill="#cdd6f4" textLength="336.0">  Write OpenAPI docs for v2             </text>
+<text x="461.2" y="119" fill="#94e2d5" textLength="201.6">api:2.1                 </text>
+<text x="662.8" y="119" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="671.2" y="119" fill="#7f849c" textLength="159.6">api             25s</text>
+<text x="830.8" y="119" fill="#cdd6f4" textLength="50.4">      </text>
+<text x="881.2" y="119" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="137" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="137" fill="#303030" textLength="8.4"> </text>
+<text x="41.2" y="137" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="49.6" y="137" fill="#f9e2af" textLength="75.6">◐ running</text>
+<text x="125.2" y="137" fill="#cdd6f4" textLength="336.0">  Draft post on tmux workflows          </text>
+<text x="461.2" y="137" fill="#94e2d5" textLength="201.6">blog:1.1                </text>
+<text x="662.8" y="137" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="671.2" y="137" fill="#7f849c" textLength="159.6">blog            10m</text>
+<text x="830.8" y="137" fill="#cdd6f4" textLength="50.4">      </text>
+<text x="881.2" y="137" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="155" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="155" fill="#303030" textLength="8.4"> </text>
+<text x="41.2" y="155" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="49.6" y="155" fill="#7f849c" textLength="75.6">○ idle   </text>
+<text x="125.2" y="155" fill="#cdd6f4" textLength="336.0">  Summarize related work chapter        </text>
+<text x="461.2" y="155" fill="#94e2d5" textLength="201.6">thesis:1.1              </text>
+<text x="662.8" y="155" fill="#cdd6f4" textLength="8.4"> </text>
+<text x="671.2" y="155" fill="#7f849c" textLength="159.6">thesis           1d</text>
+<text x="830.8" y="155" fill="#cdd6f4" textLength="50.4">      </text>
+<text x="881.2" y="155" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="173" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="173" fill="#cdd6f4" textLength="848.4">                                                                                                     </text>
+<text x="881.2" y="173" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="191" fill="#cdd6f4" textLength="16.8">│ </text>
+<text x="32.8" y="191" fill="#cdd6f4" textLength="848.4">                                                                                                     </text>
+<text x="881.2" y="191" fill="#5f5f5f" textLength="8.4">│</text>
+<text x="16.0" y="209" fill="#cdd6f4" textLength="873.6">╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯</text>
+</g>
+</svg>
