@@ -95,6 +95,7 @@ ui() {
         --layout=reverse --border=rounded --border-label=" Claude sessions " \
         --header="j/k move · g/G top/bottom · Enter jump · dd clear · r refresh · / filter · q quit" \
         --header-first --info=hidden --pointer="▌" --gutter=" " --prompt="> " \
+        --with-shell="bash -c" \
         --bind="j:down+$reset,k:up+$reset,g:first+$reset,G:last+$reset,q:abort" \
         --bind="enter:execute-silent($self jump {1})+abort" \
         --bind="d:transform:$dd" \

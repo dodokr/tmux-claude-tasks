@@ -26,7 +26,7 @@ straight to the pane.
 ## Requirements
 
 - tmux ≥ 3.3 (`display-popup`)
-- A recent [fzf](https://github.com/junegunn/fzf) (uses `--no-input` and `--gutter`; tested with 0.74)
+- A recent [fzf](https://github.com/junegunn/fzf) (uses `--no-input`, `--gutter` and `--with-shell`; tested with 0.74)
 - bash, [jq](https://jqlang.org/)
 - Claude Code with hooks support
 
