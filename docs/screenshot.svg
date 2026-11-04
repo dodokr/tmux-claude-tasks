@@ -1,60 +1,115 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="906" height="230" viewBox="0 0 906 230">
-<rect width="100%" height="100%" rx="8" fill="#1e1e2e"/>
+<rect width="906" height="230" rx="8" fill="#1e1e2e"/>
 <g font-family="JetBrains Mono, Menlo, Consolas, monospace" font-size="14">
-<text x="16.0 24.4 32.8 41.2 49.6 58.0 66.4 74.8 83.2 91.6 100.0 108.4 116.8 125.2 133.6 142.0 150.4 158.8 167.2 175.6 184.0 192.4 200.8 209.2 217.6 226.0 234.4 242.8 251.2 259.6 268.0 276.4 284.8 293.2 301.6 310.0 318.4 326.8 335.2 343.6 352.0 360.4 368.8" y="29" fill="#5f5f5f">╭──────────────────────────────────────────</text>
-<text x="385.6 394.0 402.4 410.8 419.2 427.6 444.4 452.8 461.2 469.6 478.0 486.4 494.8 503.2" y="29" fill="#afafaf">Claudesessions</text>
-<text x="520.0 528.4 536.8 545.2 553.6 562.0 570.4 578.8 587.2 595.6 604.0 612.4 620.8 629.2 637.6 646.0 654.4 662.8 671.2 679.6 688.0 696.4 704.8 713.2 721.6 730.0 738.4 746.8 755.2 763.6 772.0 780.4 788.8 797.2 805.6 814.0 822.4 830.8 839.2 847.6 856.0 864.4 872.8 881.2" y="29" fill="#5f5f5f">───────────────────────────────────────────╮</text>
+<text x="16.0" y="29" fill="#5f5f5f">╭──────────────────────────────────────────</text>
+<text x="385.6" y="29" fill="#afafaf">Claude</text>
+<text x="444.4" y="29" fill="#afafaf">sessions</text>
+<text x="520.0" y="29" fill="#5f5f5f">───────────────────────────────────────────╮</text>
 <text x="16.0" y="47" fill="#cdd6f4">│</text>
-<text x="49.6 58.0 66.4 83.2 91.6 100.0 108.4 125.2 142.0 150.4 158.8 175.6 184.0 192.4 200.8 209.2 217.6 226.0 234.4 242.8 251.2 268.0 284.8 293.2 301.6 310.0 318.4 335.2 343.6 352.0 360.4 377.2 394.0 402.4 419.2 427.6 436.0 444.4 452.8 469.6 486.4 503.2 511.6 520.0 528.4 536.8 545.2 553.6 570.4 587.2 604.0 612.4 620.8 629.2 637.6 646.0 662.8 679.6 696.4 704.8 713.2 721.6" y="47" fill="#87afaf">j/kmove·g/Gtop/bottom·Enterjump·ddclear·rrefresh·/filter·qquit</text>
+<text x="49.6" y="47" fill="#87afaf">j/k</text>
+<text x="83.2" y="47" fill="#87afaf">move</text>
+<text x="125.2" y="47" fill="#87afaf">·</text>
+<text x="142.0" y="47" fill="#87afaf">g/G</text>
+<text x="175.6" y="47" fill="#87afaf">top/bottom</text>
+<text x="268.0" y="47" fill="#87afaf">·</text>
+<text x="284.8" y="47" fill="#87afaf">Enter</text>
+<text x="335.2" y="47" fill="#87afaf">jump</text>
+<text x="377.2" y="47" fill="#87afaf">·</text>
+<text x="394.0" y="47" fill="#87afaf">dd</text>
+<text x="419.2" y="47" fill="#87afaf">clear</text>
+<text x="469.6" y="47" fill="#87afaf">·</text>
+<text x="486.4" y="47" fill="#87afaf">r</text>
+<text x="503.2" y="47" fill="#87afaf">refresh</text>
+<text x="570.4" y="47" fill="#87afaf">·</text>
+<text x="587.2" y="47" fill="#87afaf">/</text>
+<text x="604.0" y="47" fill="#87afaf">filter</text>
+<text x="662.8" y="47" fill="#87afaf">·</text>
+<text x="679.6" y="47" fill="#87afaf">q</text>
+<text x="696.4" y="47" fill="#87afaf">quit</text>
 <text x="881.2" y="47" fill="#5f5f5f">│</text>
 <text x="16.0" y="65" fill="#cdd6f4">│</text>
 <rect x="32.8" y="52" width="8.4" height="18" fill="#303030"/>
 <text x="32.8" y="65" fill="#d7005f" font-weight="bold">▌</text>
 <rect x="41.2" y="52" width="8.4" height="18" fill="#303030"/>
 <rect x="49.6" y="52" width="75.6" height="18" fill="#303030"/>
-<text x="49.6 66.4 74.8 83.2 91.6 100.0 108.4 116.8" y="65" fill="#f38ba8" font-weight="bold">?waiting</text>
+<text x="49.6" y="65" fill="#f38ba8" font-weight="bold">?</text>
+<text x="66.4" y="65" fill="#f38ba8" font-weight="bold">waiting</text>
 <rect x="125.2" y="52" width="336.0" height="18" fill="#303030"/>
-<text x="142.0 150.4 158.8 175.6 184.0 192.4 200.8 209.2 226.0 234.4 242.8 251.2 259.6 268.0 276.4 284.8 301.6 310.0 318.4 335.2 343.6 352.0 360.4" y="65" fill="#e4e4e4" font-weight="bold">Fixflakycheckoute2etest</text>
+<text x="142.0" y="65" fill="#e4e4e4" font-weight="bold">Fix</text>
+<text x="175.6" y="65" fill="#e4e4e4" font-weight="bold">flaky</text>
+<text x="226.0" y="65" fill="#e4e4e4" font-weight="bold">checkout</text>
+<text x="301.6" y="65" fill="#e4e4e4" font-weight="bold">e2e</text>
+<text x="335.2" y="65" fill="#e4e4e4" font-weight="bold">test</text>
 <rect x="461.2" y="52" width="201.6" height="18" fill="#303030"/>
-<text x="461.2 469.6 478.0 486.4 494.8 503.2 511.6 520.0 528.4 536.8 545.2" y="65" fill="#94e2d5" font-weight="bold">webshop:1.1</text>
+<text x="461.2" y="65" fill="#94e2d5" font-weight="bold">webshop:1.1</text>
 <rect x="662.8" y="52" width="8.4" height="18" fill="#303030"/>
 <rect x="671.2" y="52" width="159.6" height="18" fill="#303030"/>
-<text x="671.2 679.6 688.0 696.4 704.8 713.2 721.6 805.6 814.0 822.4" y="65" fill="#7f849c" font-weight="bold">webshop41s</text>
+<text x="671.2" y="65" fill="#7f849c" font-weight="bold">webshop</text>
+<text x="805.6" y="65" fill="#7f849c" font-weight="bold">40s</text>
 <text x="881.2" y="65" fill="#5f5f5f">│</text>
 <text x="16.0" y="83" fill="#cdd6f4">│</text>
-<text x="49.6 66.4 74.8 83.2 91.6" y="83" fill="#a6e3a1">●done</text>
-<text x="142.0 150.4 158.8 175.6 184.0 192.4 200.8 217.6 226.0 234.4 242.8 251.2 259.6 268.0 276.4 293.2 301.6 318.4 326.8 335.2 343.6 352.0 360.4" y="83" fill="#cdd6f4">Addratelimitingto/login</text>
-<text x="461.2 469.6 478.0 486.4 494.8 503.2 511.6" y="83" fill="#94e2d5">api:1.1</text>
-<text x="671.2 679.6 688.0 814.0 822.4" y="83" fill="#7f849c">api3m</text>
+<text x="49.6" y="83" fill="#a6e3a1">●</text>
+<text x="66.4" y="83" fill="#a6e3a1">done</text>
+<text x="142.0" y="83" fill="#cdd6f4">Add</text>
+<text x="175.6" y="83" fill="#cdd6f4">rate</text>
+<text x="217.6" y="83" fill="#cdd6f4">limiting</text>
+<text x="293.2" y="83" fill="#cdd6f4">to</text>
+<text x="318.4" y="83" fill="#cdd6f4">/login</text>
+<text x="461.2" y="83" fill="#94e2d5">api:1.1</text>
+<text x="671.2" y="83" fill="#7f849c">api</text>
+<text x="814.0" y="83" fill="#7f849c">3m</text>
 <text x="881.2" y="83" fill="#5f5f5f">│</text>
 <text x="16.0" y="101" fill="#cdd6f4">│</text>
-<text x="49.6 66.4 74.8 83.2 91.6" y="101" fill="#a6e3a1">●done</text>
-<text x="142.0 150.4 158.8 167.2 175.6 184.0 192.4 209.2 217.6 226.0 234.4 251.2 259.6 268.0 276.4 284.8 293.2 310.0 318.4 335.2 343.6 352.0 360.4 368.8 377.2 385.6 394.0 402.4" y="101" fill="#cdd6f4">Migratenvimconfigtolazy.nvim</text>
-<text x="461.2 469.6 478.0 486.4 494.8 503.2 511.6 520.0 528.4 536.8 545.2 553.6" y="101" fill="#94e2d5">dotfiles:1.1</text>
-<text x="671.2 679.6 688.0 696.4 704.8 713.2 721.6 730.0 814.0 822.4" y="101" fill="#7f849c">dotfiles1h</text>
+<text x="49.6" y="101" fill="#a6e3a1">●</text>
+<text x="66.4" y="101" fill="#a6e3a1">done</text>
+<text x="142.0" y="101" fill="#cdd6f4">Migrate</text>
+<text x="209.2" y="101" fill="#cdd6f4">nvim</text>
+<text x="251.2" y="101" fill="#cdd6f4">config</text>
+<text x="310.0" y="101" fill="#cdd6f4">to</text>
+<text x="335.2" y="101" fill="#cdd6f4">lazy.nvim</text>
+<text x="461.2" y="101" fill="#94e2d5">dotfiles:1.1</text>
+<text x="671.2" y="101" fill="#7f849c">dotfiles</text>
+<text x="814.0" y="101" fill="#7f849c">1h</text>
 <text x="881.2" y="101" fill="#5f5f5f">│</text>
 <text x="16.0" y="119" fill="#cdd6f4">│</text>
-<text x="49.6 66.4 74.8 83.2 91.6 100.0 108.4 116.8" y="119" fill="#f9e2af">◐running</text>
-<text x="142.0 150.4 158.8 167.2 175.6 192.4 200.8 209.2 217.6 226.0 234.4 242.8 259.6 268.0 276.4 284.8 301.6 310.0 318.4 335.2 343.6" y="119" fill="#cdd6f4">WriteOpenAPIdocsforv2</text>
-<text x="461.2 469.6 478.0 486.4 494.8 503.2 511.6" y="119" fill="#94e2d5">api:2.1</text>
-<text x="671.2 679.6 688.0 805.6 814.0 822.4" y="119" fill="#7f849c">api26s</text>
+<text x="49.6" y="119" fill="#f9e2af">◐</text>
+<text x="66.4" y="119" fill="#f9e2af">running</text>
+<text x="142.0" y="119" fill="#cdd6f4">Write</text>
+<text x="192.4" y="119" fill="#cdd6f4">OpenAPI</text>
+<text x="259.6" y="119" fill="#cdd6f4">docs</text>
+<text x="301.6" y="119" fill="#cdd6f4">for</text>
+<text x="335.2" y="119" fill="#cdd6f4">v2</text>
+<text x="461.2" y="119" fill="#94e2d5">api:2.1</text>
+<text x="671.2" y="119" fill="#7f849c">api</text>
+<text x="805.6" y="119" fill="#7f849c">25s</text>
 <text x="881.2" y="119" fill="#5f5f5f">│</text>
 <text x="16.0" y="137" fill="#cdd6f4">│</text>
-<text x="49.6 66.4 74.8 83.2 91.6 100.0 108.4 116.8" y="137" fill="#f9e2af">◐running</text>
-<text x="142.0 150.4 158.8 167.2 175.6 192.4 200.8 209.2 217.6 234.4 242.8 259.6 268.0 276.4 284.8 301.6 310.0 318.4 326.8 335.2 343.6 352.0 360.4 368.8" y="137" fill="#cdd6f4">Draftpostontmuxworkflows</text>
-<text x="461.2 469.6 478.0 486.4 494.8 503.2 511.6 520.0" y="137" fill="#94e2d5">blog:1.1</text>
-<text x="671.2 679.6 688.0 696.4 805.6 814.0 822.4" y="137" fill="#7f849c">blog10m</text>
+<text x="49.6" y="137" fill="#f9e2af">◐</text>
+<text x="66.4" y="137" fill="#f9e2af">running</text>
+<text x="142.0" y="137" fill="#cdd6f4">Draft</text>
+<text x="192.4" y="137" fill="#cdd6f4">post</text>
+<text x="234.4" y="137" fill="#cdd6f4">on</text>
+<text x="259.6" y="137" fill="#cdd6f4">tmux</text>
+<text x="301.6" y="137" fill="#cdd6f4">workflows</text>
+<text x="461.2" y="137" fill="#94e2d5">blog:1.1</text>
+<text x="671.2" y="137" fill="#7f849c">blog</text>
+<text x="805.6" y="137" fill="#7f849c">10m</text>
 <text x="881.2" y="137" fill="#5f5f5f">│</text>
 <text x="16.0" y="155" fill="#cdd6f4">│</text>
-<text x="49.6 66.4 74.8 83.2 91.6" y="155" fill="#7f849c">○idle</text>
-<text x="142.0 150.4 158.8 167.2 175.6 184.0 192.4 200.8 209.2 226.0 234.4 242.8 251.2 259.6 268.0 276.4 293.2 301.6 310.0 318.4 335.2 343.6 352.0 360.4 368.8 377.2 385.6" y="155" fill="#cdd6f4">Summarizerelatedworkchapter</text>
-<text x="461.2 469.6 478.0 486.4 494.8 503.2 511.6 520.0 528.4 536.8" y="155" fill="#94e2d5">thesis:1.1</text>
-<text x="671.2 679.6 688.0 696.4 704.8 713.2 814.0 822.4" y="155" fill="#7f849c">thesis1d</text>
+<text x="49.6" y="155" fill="#7f849c">○</text>
+<text x="66.4" y="155" fill="#7f849c">idle</text>
+<text x="142.0" y="155" fill="#cdd6f4">Summarize</text>
+<text x="226.0" y="155" fill="#cdd6f4">related</text>
+<text x="293.2" y="155" fill="#cdd6f4">work</text>
+<text x="335.2" y="155" fill="#cdd6f4">chapter</text>
+<text x="461.2" y="155" fill="#94e2d5">thesis:1.1</text>
+<text x="671.2" y="155" fill="#7f849c">thesis</text>
+<text x="814.0" y="155" fill="#7f849c">1d</text>
 <text x="881.2" y="155" fill="#5f5f5f">│</text>
 <text x="16.0" y="173" fill="#cdd6f4">│</text>
 <text x="881.2" y="173" fill="#5f5f5f">│</text>
 <text x="16.0" y="191" fill="#cdd6f4">│</text>
 <text x="881.2" y="191" fill="#5f5f5f">│</text>
-<text x="16.0 24.4 32.8 41.2 49.6 58.0 66.4 74.8 83.2 91.6 100.0 108.4 116.8 125.2 133.6 142.0 150.4 158.8 167.2 175.6 184.0 192.4 200.8 209.2 217.6 226.0 234.4 242.8 251.2 259.6 268.0 276.4 284.8 293.2 301.6 310.0 318.4 326.8 335.2 343.6 352.0 360.4 368.8 377.2 385.6 394.0 402.4 410.8 419.2 427.6 436.0 444.4 452.8 461.2 469.6 478.0 486.4 494.8 503.2 511.6 520.0 528.4 536.8 545.2 553.6 562.0 570.4 578.8 587.2 595.6 604.0 612.4 620.8 629.2 637.6 646.0 654.4 662.8 671.2 679.6 688.0 696.4 704.8 713.2 721.6 730.0 738.4 746.8 755.2 763.6 772.0 780.4 788.8 797.2 805.6 814.0 822.4 830.8 839.2 847.6 856.0 864.4 872.8 881.2" y="209" fill="#cdd6f4">╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯</text>
+<text x="16.0" y="209" fill="#cdd6f4">╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯</text>
 </g>
 </svg>

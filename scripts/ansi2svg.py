@@ -74,7 +74,7 @@ def main():
     out = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}" height="{height:.0f}" '
         f'viewBox="0 0 {width:.0f} {height:.0f}">',
-        f'<rect width="100%" height="100%" rx="8" fill="{BG}"/>',
+        f'<rect width="{width:.0f}" height="{height:.0f}" rx="8" fill="{BG}"/>',
         '<g font-family="JetBrains Mono, Menlo, Consolas, monospace" font-size="14">',
     ]
     for row, line in enumerate(lines):
@@ -84,14 +84,14 @@ def main():
             x = PAD + col * CHAR_W
             if bg:
                 out.append(f'<rect x="{x:.1f}" y="{y}" width="{len(text) * CHAR_W:.1f}" height="{LINE_H}" fill="{bg}"/>')
-            # Pin every visible glyph to its terminal cell. textLength would stretch runs
-            # with trailing padding, since browsers don't measure trailing spaces.
-            glyphs = [(i, ch) for i, ch in enumerate(text) if ch != " "]
-            if glyphs:
-                xs = " ".join(f"{x + i * CHAR_W:.1f}" for i, _ in glyphs)
-                chars = html.escape("".join(ch for _, ch in glyphs))
-                weight = ' font-weight="bold"' if bold else ""
-                out.append(f'<text x="{xs}" y="{y + 13}" fill="{fg or FG}"{weight}>{chars}</text>')
+            # One <text> per word, placed on its terminal cell. Avoids textLength (browsers
+            # stretch runs with trailing spaces) and per-glyph x lists (Qt/Gwenview ignores them).
+            weight = ' font-weight="bold"' if bold else ""
+            for m in re.finditer(r"\S+", text):
+                out.append(
+                    f'<text x="{x + m.start() * CHAR_W:.1f}" y="{y + 13}" fill="{fg or FG}"{weight}>'
+                    f"{html.escape(m.group())}</text>"
+                )
             col += len(text)
     out += ["</g>", "</svg>"]
     print("\n".join(out))
