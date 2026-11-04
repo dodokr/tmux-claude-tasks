@@ -4,7 +4,7 @@
 #   claude-tasks              open the picker (meant for: tmux display-popup -E)
 #   claude-tasks hook EVENT   record a hook event (Claude Code hook JSON on stdin)
 #   claude-tasks list         print sessions (used by the picker)
-#   claude-tasks clear PANE   mark a session seen (any status -> idle)
+#   claude-tasks clear PANE   remove a session from the list until its next hook event
 #   claude-tasks jump PANE    switch the current tmux client to that pane
 #
 # State: one file per tmux pane in $CLAUDE_TASKS_DIR (default
@@ -106,10 +106,7 @@ ui() {
 case "$1" in
     hook) hook "$2" ;;
     list) list ;;
-    clear)
-        f="$state/${2#%}"
-        [[ -f "$f" ]] && set_status "$2" idle
-        ;;
+    clear) rm -f -- "$state/${2#%}" ;;
     jump) jump "$2" ;;
     "") ui ;;
     *) sed -n '2,9s/^# \{0,1\}//p' "$self" >&2; exit 1 ;;

@@ -69,18 +69,19 @@ Press your binding (`prefix + C-i` above) to open the picker.
 | `j` / `k` | move down / up |
 | `g` / `G` | first / last |
 | `Enter` | jump to that pane |
-| `dd` | clear the entry (mark it seen → `idle`) |
+| `dd` | remove the entry from the list |
 | `r` | refresh |
 | `/` | filter; `Esc` returns to normal mode |
 | `q`, `Esc`, `Ctrl+[` | close |
 
-A `done` entry stays until you clear it with `dd`, or until you send that session a new prompt.
+A `done` entry stays until you remove it with `dd`, or until you send that session a new prompt.
+A removed session reappears as soon as it does something again (new prompt, reply, question).
 
 ### Statuses
 
 | Status | Set by hook | Meaning |
 | --- | --- | --- |
-| `idle` | `SessionStart`, or `dd` | Session open, nothing to look at |
+| `idle` | `SessionStart` | Session open, nothing to look at |
 | `running` | `UserPromptSubmit`, `PostToolUse` after a prompt | Claude is working |
 | `waiting` | `Notification` (`permission_prompt`, `elicitation_dialog`) | Claude needs your answer |
 | `done` | `Stop` | Claude finished its reply |
@@ -95,7 +96,7 @@ The "Claude is waiting for your input" idle reminder is ignored, so it never tur
 claude-tasks              open the picker (meant for: tmux display-popup -E)
 claude-tasks hook EVENT   record a hook event (Claude Code hook JSON on stdin)
 claude-tasks list         print sessions (used by the picker)
-claude-tasks clear PANE   mark a session seen (any status -> idle)
+claude-tasks clear PANE   remove a session from the list until its next hook event
 claude-tasks jump PANE    switch the current tmux client to that pane
 ```
 
@@ -112,7 +113,7 @@ shown.
   tmux/your terminal may turn that into a desktop notification. To rely on `claude-tasks`
   alone, set *Notifications* to disabled in Claude Code's `/config`.
 - **Interrupted tasks** (Esc in Claude) may not fire `Stop`, leaving the entry `running` — `dd`
-  resets it.
+  removes it.
 
 ## Development
 
