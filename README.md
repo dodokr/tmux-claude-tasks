@@ -72,7 +72,7 @@ Press your binding (`prefix + C-i` above) to open the picker.
 | `dd` | remove the entry from the list |
 | `r` | refresh |
 | `/` | filter; `Esc` returns to normal mode |
-| `s` | search all past sessions (only with [claude-sessions](https://github.com/dodokr/claude-sessions) installed) |
+| `s` | search all past sessions (only with [tmux-claude-sessions](https://github.com/dodokr/tmux-claude-sessions) installed) |
 | `q`, `Esc`, `Ctrl+[` | close |
 
 A `done` entry stays until you remove it with `dd`, or until you send that session a new prompt.
@@ -107,7 +107,7 @@ One small file per tmux pane in `$CLAUDE_TASKS_DIR`
 (default `${XDG_STATE_HOME:-~/.local/state}/claude-tasks/`), containing
 `status<TAB>epoch<TAB>cwd<TAB>session-id`. Files whose pane no longer exists are pruned whenever
 the list is shown. Other tools can read these files to find which pane a session is open in —
-[claude-sessions](https://github.com/dodokr/claude-sessions) uses them to jump to an open
+[tmux-claude-sessions](https://github.com/dodokr/tmux-claude-sessions) uses them to jump to an open
 session instead of resuming a second copy.
 
 ## Tips

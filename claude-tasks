@@ -92,7 +92,7 @@ ui() {
     # d sets it to "d> ", a second d clears the entry, any other key resets it.
     local keys="j,k,g,G,d,r,q,/" header="j/k move · g/G top/bottom · Enter jump · dd clear · r refresh · / filter · q quit"
     local extra=()
-    # Optional companion: search all past sessions (github.com/dodokr/claude-sessions).
+    # Optional companion: search all past sessions (github.com/dodokr/tmux-claude-sessions).
     if command -v claude-sessions >/dev/null; then
         keys+=",s" header="${header/ · q quit/ · s search all · q quit}"
         extra=(--bind="s:become(claude-sessions)")
