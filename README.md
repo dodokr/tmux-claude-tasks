@@ -21,7 +21,8 @@ straight to the pane.
   (e.g. "Fix flaky checkout e2e test"), falling back to the project folder.
 - **Vim keys**, Enter to jump to the pane (switching tmux session/window as needed).
 - **No notifications, no daemon.** One bash script; each hook call takes ~20 ms.
-- Closed panes disappear automatically.
+- Closed panes disappear automatically, and so do panes back at a shell prompt (Claude exited
+  without its `SessionEnd` hook running, e.g. when killed).
 
 ## Requirements
 

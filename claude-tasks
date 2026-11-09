@@ -57,15 +57,23 @@ ago() {
 }
 
 list() {
-    local panes file line id status epoch cwd target title rank icon color
-    panes="$(tmux list-panes -a -F '#{pane_id}')"
+    local file line id status epoch cwd target title rank icon color pane command
+    local -A commands=()
+    while IFS=$'\t' read -r pane command; do
+        commands[$pane]="$command"
+    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_current_command}')
     for file in "$state"/*; do
         [[ -f "$file" ]] || continue
         id="%${file##*/}"
-        if ! grep -qx -- "$id" <<<"$panes"; then
+        if [[ -z "${commands[$id]+set}" ]]; then
             rm -f "$file"
             continue
         fi
+        # Back at a shell prompt: Claude is gone even though SessionEnd never fired (e.g. it
+        # was killed). Hide it; the file is kept, so a new session in this pane takes over.
+        case "${commands[$id]}" in
+            sh | bash | zsh | fish | dash | ksh | tcsh | csh | nu | xonsh | elvish) continue ;;
+        esac
         IFS= read -r line <"$file"
         IFS=$'\x1f' read -r status epoch cwd _ <<<"${line//$'\t'/$'\x1f'}"
         IFS=$'\t' read -r target title <<<"$(tmux display -p -t "$id" $'#S:#I.#P\t#{pane_title}')"
