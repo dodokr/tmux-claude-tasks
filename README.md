@@ -21,8 +21,9 @@ straight to the pane.
   (e.g. "Fix flaky checkout e2e test"), falling back to the project folder.
 - **Vim keys**, Enter to jump to the pane (switching tmux session/window as needed).
 - **No notifications, no daemon.** One bash script; each hook call takes ~20 ms.
-- Closed panes disappear automatically, and so do panes back at a shell prompt (Claude exited
-  without its `SessionEnd` hook running, e.g. when killed).
+- Closed panes disappear automatically, and so do sessions whose Claude process is gone without
+  its `SessionEnd` hook running (e.g. killed). This tracks the process itself, so it works when
+  Claude is started through a wrapper script.
 
 ## Requirements
 
@@ -106,8 +107,10 @@ claude-tasks jump PANE    switch the current tmux client to that pane
 
 One small file per tmux pane in `$CLAUDE_TASKS_DIR`
 (default `${XDG_STATE_HOME:-~/.local/state}/claude-tasks/`), containing
-`status<TAB>epoch<TAB>cwd<TAB>session-id`. Files whose pane no longer exists are pruned whenever
-the list is shown. Other tools can read these files to find which pane a session is open in —
+`status<TAB>epoch<TAB>cwd<TAB>session-id<TAB>process`, where *process* is `pid start-time` of the
+process just below the pane's shell that hosts the session (Claude, or the wrapper that started
+it). Files whose pane no longer exists are pruned whenever the list is shown; entries whose
+process no longer exists are hidden until a new session starts in that pane. Other tools can read these files to find which pane a session is open in —
 [tmux-claude-sessions](https://github.com/dodokr/tmux-claude-sessions) uses them to jump to an open
 session instead of resuming a second copy.
 
@@ -122,6 +125,7 @@ session instead of resuming a second copy.
 ## Development
 
 ```sh
+tests/test.sh              # hook and list against fake Claude processes on an isolated tmux server
 scripts/demo.sh            # try the picker on an isolated tmux server with fake sessions
 CAPTURE_ANSI=1 scripts/demo.sh --capture | scripts/ansi2svg.py > docs/screenshot.svg
 ```

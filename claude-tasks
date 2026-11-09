@@ -8,18 +8,46 @@
 #   claude-tasks jump PANE    switch the current tmux client to that pane
 #
 # State: one file per tmux pane in $CLAUDE_TASKS_DIR (default
-# $XDG_STATE_HOME/claude-tasks), holding "status<TAB>epoch<TAB>cwd<TAB>session id".
-# Files for panes that no longer exist are pruned.
+# $XDG_STATE_HOME/claude-tasks), holding "status<TAB>epoch<TAB>cwd<TAB>session id<TAB>process",
+# where process is "pid start-time" of the process hosting the session. Files for panes that no
+# longer exist are pruned; entries whose process is gone are hidden.
 
 state="${CLAUDE_TASKS_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/claude-tasks}"
 mkdir -p "$state"
 self="$(realpath "$0")"
 
-set_status() { # pane status [cwd] [session-id]
-    local file="$state/${1#%}" cwd="$3" sid="$4"
+started() { # pid...: one "pid start-time" line each, for pids that exist
+    # C locale and squeezed spaces, so the hook and list produce identical strings.
+    LC_ALL=C ps -o pid=,lstart= -p "$(IFS=,; echo "$*")" 2>/dev/null | tr -s ' ' | sed 's/^ //'
+}
+
+# The process just below the pane's shell that this hook descends from: Claude itself, or a
+# wrapper script that started it. Its name is no use (a non-exec wrapper makes tmux report the
+# pane as running "fish"), but while it exists, the session is open. Empty if not under the pane.
+host_process() { # pane
+    local root pid=$$ parent
+    root="$(tmux display -p -t "$1" '#{pane_pid}' 2>/dev/null)"
+    [[ -n "$root" ]] || return 0
+    while ((pid > 1)); do
+        parent="$(ps -o ppid= -p "$pid" 2>/dev/null)"
+        parent="${parent//[[:space:]]/}"
+        [[ -n "$parent" ]] || return 0
+        if [[ "$parent" == "$root" ]]; then
+            started "$pid"
+            return 0
+        fi
+        pid="$parent"
+    done
+}
+
+set_status() { # pane status [cwd] [session-id] [new-process]
+    local file="$state/${1#%}" cwd="$3" sid="$4" proc=""
     [[ -z "$cwd" && -f "$file" ]] && cwd="$(cut -f3 "$file")"
     [[ -z "$sid" && -f "$file" ]] && sid="$(cut -f4 "$file")"
-    printf '%s\t%s\t%s\t%s\n' "$2" "$(date +%s)" "$cwd" "$sid" >"$file"
+    # SessionStart may come from a new Claude process; otherwise keep the recorded one.
+    [[ -z "$5" && -f "$file" ]] && proc="$(cut -f5 "$file")"
+    [[ -z "$proc" ]] && proc="$(host_process "$1")"
+    printf '%s\t%s\t%s\t%s\t%s\n' "$2" "$(date +%s)" "$cwd" "$sid" "$proc" >"$file"
 }
 
 hook() {
@@ -29,7 +57,7 @@ hook() {
     # \x1f, not tab: read collapses runs of whitespace IFS characters, losing empty fields.
     IFS=$'\x1f' read -r cwd sid < <(jq -r '"\(.cwd // "")\u001f\(.session_id // "")"' <<<"$input" 2>/dev/null)
     case "$1" in
-        SessionStart) set_status "$TMUX_PANE" idle "$cwd" "$sid" ;;
+        SessionStart) set_status "$TMUX_PANE" idle "$cwd" "$sid" new ;;
         UserPromptSubmit) set_status "$TMUX_PANE" running "$cwd" "$sid" ;;
         Stop) set_status "$TMUX_PANE" done "$cwd" "$sid" ;;
         SessionEnd) rm -f "$file" ;;
@@ -57,25 +85,26 @@ ago() {
 }
 
 list() {
-    local file line id status epoch cwd target title rank icon color pane command
-    local -A commands=()
-    while IFS=$'\t' read -r pane command; do
-        commands[$pane]="$command"
-    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_current_command}')
+    local panes file line id status epoch cwd proc target title rank icon color pids
+    local -A alive=()
+    panes="$(tmux list-panes -a -F '#{pane_id}')"
+    pids=($(cut -sf5 -- "$state"/* 2>/dev/null | cut -d' ' -f1 | grep -xE '[0-9]+'))
+    if ((${#pids[@]})); then
+        while IFS= read -r line; do alive[$line]=1; done < <(started "${pids[@]}")
+    fi
     for file in "$state"/*; do
         [[ -f "$file" ]] || continue
         id="%${file##*/}"
-        if [[ -z "${commands[$id]+set}" ]]; then
+        if ! grep -qx -- "$id" <<<"$panes"; then
             rm -f "$file"
             continue
         fi
-        # Back at a shell prompt: Claude is gone even though SessionEnd never fired (e.g. it
-        # was killed). Hide it; the file is kept, so a new session in this pane takes over.
-        case "${commands[$id]}" in
-            sh | bash | zsh | fish | dash | ksh | tcsh | csh | nu | xonsh | elvish) continue ;;
-        esac
         IFS= read -r line <"$file"
-        IFS=$'\x1f' read -r status epoch cwd _ <<<"${line//$'\t'/$'\x1f'}"
+        IFS=$'\x1f' read -r status epoch cwd _ proc <<<"${line//$'\t'/$'\x1f'}"
+        # The process hosting this session is gone: Claude was killed, so SessionEnd never ran.
+        # Hide it; a new session in this pane overwrites the file. (Entries from before this
+        # field existed have no process and stay visible.)
+        [[ -n "$proc" && -z "${alive[$proc]-}" ]] && continue
         IFS=$'\t' read -r target title <<<"$(tmux display -p -t "$id" $'#S:#I.#P\t#{pane_title}')"
         # Claude Code sets the pane title to a session summary, e.g. "✳ Fix login bug".
         [[ "$title" =~ ^[^[:alnum:][:space:]]+[[:space:]]+(.*)$ ]] && title="${BASH_REMATCH[1]}"
