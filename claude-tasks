@@ -6,19 +6,35 @@
 #   claude-tasks list         print sessions (used by the picker)
 #   claude-tasks clear PANE   remove a session from the list until its next hook event
 #   claude-tasks jump PANE    switch the current tmux client to that pane
+#   claude-tasks resurrect-save | resurrect-restore
+#                             tmux-resurrect hooks: remember open sessions, resume them
 #
 # State: one file per tmux pane in $CLAUDE_TASKS_DIR (default
 # $XDG_STATE_HOME/claude-tasks), holding "status<TAB>epoch<TAB>cwd<TAB>session id<TAB>process",
-# where process is "pid start-time" of the process hosting the session. Files for panes that no
+# where process is "pid start" of the process hosting the session. Files for panes that no
 # longer exist are pruned; entries whose process is gone are hidden.
 
 state="${CLAUDE_TASKS_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/claude-tasks}"
 mkdir -p "$state"
 self="$(realpath "$0")"
 
-started() { # pid...: one "pid start-time" line each, for pids that exist
-    # C locale and squeezed spaces, so the hook and list produce identical strings.
-    LC_ALL=C ps -o pid=,lstart= -p "$(IFS=,; echo "$*")" 2>/dev/null | tr -s ' ' | sed 's/^ //'
+# One "pid start" line for each pid that exists. start is when the process started, in clock
+# ticks since boot (/proc/PID/stat field 22), which never changes. ps's lstart is computed from
+# it and the boot time and shifts by seconds whenever the machine sleeps, so it is only the
+# fallback where there is no /proc.
+procfs="${CLAUDE_TASKS_PROC:-/proc}"
+started() { # pid...
+    local pid stat f
+    if [[ -d "$procfs" ]]; then
+        for pid; do
+            stat="$(cat "$procfs/$pid/stat" 2>/dev/null)" || continue
+            read -ra f <<<"${stat##*) }" # the process name may contain spaces and ")"
+            echo "$pid ${f[19]}"
+        done
+    else
+        # C locale and squeezed spaces, so the hook and list produce identical strings.
+        LC_ALL=C ps -o pid=,lstart= -p "$(IFS=,; echo "$*")" 2>/dev/null | tr -s ' ' | sed 's/^ //'
+    fi
 }
 
 # The process just below the pane's shell that this hook descends from: Claude itself, or a
@@ -84,13 +100,15 @@ ago() {
     fi
 }
 
-list() {
-    local panes file line id status epoch cwd proc target title rank icon color pids
-    local -A alive=()
+# Open sessions, one "pane<US>status<US>epoch<US>cwd<US>session id" line each (US = \x1f).
+# Prunes the files of panes that no longer exist.
+entries() {
+    local panes file line id status epoch cwd sid proc pids
+    local -A alive=() alive_pid=()
     panes="$(tmux list-panes -a -F '#{pane_id}')"
     pids=($(cut -sf5 -- "$state"/* 2>/dev/null | cut -d' ' -f1 | grep -xE '[0-9]+'))
     if ((${#pids[@]})); then
-        while IFS= read -r line; do alive[$line]=1; done < <(started "${pids[@]}")
+        while IFS= read -r line; do alive[$line]=1 alive_pid[${line%% *}]=1; done < <(started "${pids[@]}")
     fi
     for file in "$state"/*; do
         [[ -f "$file" ]] || continue
@@ -100,11 +118,21 @@ list() {
             continue
         fi
         IFS= read -r line <"$file"
-        IFS=$'\x1f' read -r status epoch cwd _ proc <<<"${line//$'\t'/$'\x1f'}"
+        IFS=$'\x1f' read -r status epoch cwd sid proc <<<"${line//$'\t'/$'\x1f'}"
         # The process hosting this session is gone: Claude was killed, so SessionEnd never ran.
-        # Hide it; a new session in this pane overwrites the file. (Entries from before this
-        # field existed have no process and stay visible.)
-        [[ -n "$proc" && -z "${alive[$proc]-}" ]] && continue
+        # Hide it; a new session in this pane overwrites the file. Entries from before this
+        # field existed have no process and stay visible; ones recorded as ps lstart
+        # ("pid weekday month day time year") drift across sleep, so only their pid counts.
+        if [[ -n "$proc" && -z "${alive[$proc]-}" ]]; then
+            [[ "$proc" == *" "*" "* && -n "${alive_pid[${proc%% *}]-}" ]] || continue
+        fi
+        printf '%s\x1f%s\x1f%s\x1f%s\x1f%s\n' "$id" "$status" "$epoch" "$cwd" "$sid"
+    done
+}
+
+list() {
+    local id status epoch cwd target title rank icon color
+    entries | while IFS=$'\x1f' read -r id status epoch cwd _; do
         IFS=$'\t' read -r target title <<<"$(tmux display -p -t "$id" $'#S:#I.#P\t#{pane_title}')"
         # Claude Code sets the pane title to a session summary, e.g. "✳ Fix login bug".
         [[ "$title" =~ ^[^[:alnum:][:space:]]+[[:space:]]+(.*)$ ]] && title="${BASH_REMATCH[1]}"
@@ -118,6 +146,64 @@ list() {
         printf '%s\t%s\t%s\t\e[%sm%s %-7s\e[0m  %-36.36s  \e[36m%-24.24s\e[0m \e[90m%-14.14s %4s\e[0m\n' \
             "$rank" "$epoch" "$id" "$color" "$icon" "$status" "$title" "$target" "${cwd##*/}" "$(ago "$epoch")"
     done | sort -t$'\t' -k1,1n -k2,2nr | cut -f3-
+}
+
+# tmux-resurrect integration. A resurrect save only has each pane's command line, which for a
+# Claude started as plain `claude` (or through a wrapper script) carries no session id, so
+# restoring it would start a new, empty session. Instead, after each save, write the open
+# sessions next to the save file, keyed by session:window.pane, which a restore recreates; after
+# a restore, type the resume command into those panes.
+resurrect_dir() { # same lookup as tmux-resurrect
+    local dir
+    dir="$(tmux show -gqv @resurrect-dir)"
+    if [[ -z "$dir" ]]; then
+        dir="$HOME/.tmux/resurrect"
+        [[ -d "$dir" ]] || dir="${XDG_DATA_HOME:-$HOME/.local/share}/tmux/resurrect"
+    fi
+    dir="${dir//\$HOME/$HOME}"
+    echo "${dir//\~/$HOME}"
+}
+
+resurrect_save() {
+    local dir last file id sid cwd
+    dir="$(resurrect_dir)"
+    last="$(readlink "$dir/last")" || return 0
+    file="$dir/${last##*/}.claude-tasks"
+    entries | while IFS=$'\x1f' read -r id _ _ cwd sid; do
+        [[ -n "$sid" ]] && printf '%s\t%s\t%s\n' "$(tmux display -p -t "$id" '#S:#I.#P')" "$sid" "$cwd"
+    done >"$file.tmp" && mv -f "$file.tmp" "$file"
+    # Drop the lists of saves that tmux-resurrect has deleted.
+    for file in "$dir"/*.claude-tasks; do
+        [[ -e "${file%.claude-tasks}" ]] || rm -f "$file"
+    done
+}
+
+resurrect_restore() {
+    local dir last mode template target sid cwd pane cmd path
+    dir="$(resurrect_dir)"
+    last="$(readlink "$dir/last")" || return 0
+    [[ -f "$dir/${last##*/}.claude-tasks" ]] || return 0
+    mode="$(tmux show -gqv @claude-tasks-restore)"
+    [[ "$mode" == off ]] && return 0
+    template="$(tmux show -gqv @claude-tasks-resume-command)"
+    [[ -n "$template" ]] || template='claude --resume {id}'
+    while IFS=$'\t' read -r target sid cwd; do
+        [[ "$sid" =~ ^[[:alnum:]-]+$ ]] || continue
+        # "=" matches the session name exactly instead of by prefix.
+        IFS=$'\t' read -r pane cmd path < <(tmux display -p -t "=$target" $'#{pane_id}\t#{pane_current_command}\t#{pane_current_path}' 2>/dev/null)
+        [[ -n "$pane" ]] || continue
+        # Only into a pane that is back at a shell prompt, not one resurrect started a program in.
+        case "$cmd" in
+            bash | zsh | fish | sh | dash | ksh | mksh | tcsh | csh | nu | elvish | xonsh) ;;
+            *) continue ;;
+        esac
+        # claude --resume looks for the session in the current folder's project.
+        if [[ "$path" != "$cwd" && -d "$cwd" && "$cwd" != *"'"* ]]; then
+            tmux send-keys -t "$pane" -l "cd '$cwd'" \; send-keys -t "$pane" Enter
+        fi
+        tmux send-keys -t "$pane" -l "${template//\{id\}/$sid}"
+        [[ "$mode" == type ]] || tmux send-keys -t "$pane" Enter
+    done <"$dir/${last##*/}.claude-tasks"
 }
 
 jump() {
@@ -156,6 +242,8 @@ case "$1" in
     list) list ;;
     clear) rm -f -- "$state/${2#%}" ;;
     jump) jump "$2" ;;
+    resurrect-save) resurrect_save ;;
+    resurrect-restore) resurrect_restore ;;
     "") ui ;;
-    *) sed -n '2,9s/^# \{0,1\}//p' "$self" >&2; exit 1 ;;
+    *) sed -n '2,11s/^# \{0,1\}//p' "$self" >&2; exit 1 ;;
 esac

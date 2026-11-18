@@ -23,7 +23,9 @@ straight to the pane.
 - **No notifications, no daemon.** One bash script; each hook call takes ~20 ms.
 - Closed panes disappear automatically, and so do sessions whose Claude process is gone without
   its `SessionEnd` hook running (e.g. killed). This tracks the process itself, so it works when
-  Claude is started through a wrapper script.
+  Claude is started through a wrapper script, and across suspend.
+- **Survives a reboot with [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)**:
+  open sessions are resumed in their panes after a restore (see below).
 
 ## Requirements
 
@@ -61,6 +63,27 @@ straight to the pane.
 
    Terminals send `C-i` as `Tab` unless tmux `extended-keys` is on, so both are bound. This
    replaces tmux's default `prefix + Tab`; pick another key if you use that.
+
+4. **Optional: resume sessions after a tmux-resurrect restore.** A resurrect save only holds each
+   pane's command line, and for a Claude started as plain `claude` (or through a script) that
+   has no session id, so resurrect can't bring the session back. `claude-tasks` knows which
+   session is open in which pane; with these hooks it writes that list next to each save and,
+   after a restore, types the resume command into the restored panes:
+
+   ```tmux
+   set -g @resurrect-hook-post-save-all '~/.local/bin/claude-tasks resurrect-save'
+   set -g @resurrect-hook-post-restore-all '~/.local/bin/claude-tasks resurrect-restore'
+   # Optional: the command typed ({id} is the session id), and 'type' to type it without
+   # pressing Enter, so only the sessions you pick start ('off' disables restoring).
+   set -g @claude-tasks-resume-command 'claude --resume {id}'
+   set -g @claude-tasks-restore 'run'
+   ```
+
+   Only panes that are back at a shell prompt get the command; it `cd`s to the session's folder
+   first if the pane is elsewhere. Don't add `claude` to `@resurrect-processes`, or sessions
+   would start twice. Resurrect saves only when you press `prefix + C-s`, so pair it with
+   [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) (saves every 15 minutes)
+   to have a recent save when the machine goes down.
 
 ## Usage
 
@@ -101,16 +124,22 @@ claude-tasks hook EVENT   record a hook event (Claude Code hook JSON on stdin)
 claude-tasks list         print sessions (used by the picker)
 claude-tasks clear PANE   remove a session from the list until its next hook event
 claude-tasks jump PANE    switch the current tmux client to that pane
+claude-tasks resurrect-save | resurrect-restore
+                          tmux-resurrect hooks: remember open sessions, resume them
 ```
 
 ### State
 
 One small file per tmux pane in `$CLAUDE_TASKS_DIR`
 (default `${XDG_STATE_HOME:-~/.local/state}/claude-tasks/`), containing
-`status<TAB>epoch<TAB>cwd<TAB>session-id<TAB>process`, where *process* is `pid start-time` of the
+`status<TAB>epoch<TAB>cwd<TAB>session-id<TAB>process`, where *process* is `pid start` of the
 process just below the pane's shell that hosts the session (Claude, or the wrapper that started
-it). Files whose pane no longer exists are pruned whenever the list is shown; entries whose
-process no longer exists are hidden until a new session starts in that pane. Other tools can read these files to find which pane a session is open in —
+it). *start* is the process start time in clock ticks since boot, from `/proc/PID/stat`, which
+tells a reused pid apart and doesn't change when the machine sleeps (unlike `ps -o lstart`,
+which is the fallback on systems without `/proc`). Files whose pane no longer exists are pruned
+whenever the list is shown; entries whose process no longer exists are hidden until a new
+session starts in that pane. Other tools can read these files to find which pane a session is
+open in —
 [tmux-claude-sessions](https://github.com/dodokr/tmux-claude-sessions) uses them to jump to an open
 session instead of resuming a second copy.
 
@@ -125,7 +154,7 @@ session instead of resuming a second copy.
 ## Development
 
 ```sh
-tests/test.sh              # hook and list against fake Claude processes on an isolated tmux server
+tests/test.sh              # hook, list and resurrect hooks with fake Claude processes on an isolated tmux server
 scripts/demo.sh            # try the picker on an isolated tmux server with fake sessions
 CAPTURE_ANSI=1 scripts/demo.sh --capture | scripts/ansi2svg.py > docs/screenshot.svg
 ```
