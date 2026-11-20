@@ -149,5 +149,14 @@ sleep 0.3
 check "with @claude-tasks-restore type, the command is typed but not run" \
     bash -c "tmux -L '$sock' capture-pane -p -t '$direct' | grep -q 'typed s3\$'"
 
+check "the picker starts with the one-line short header" \
+    test "$("$root/claude-tasks" header)" = "Enter jump · dd clear · ? more"
+check "? shows the full key list (state kept in the header label)" \
+    bash -c "FZF_HEADER_LABEL= '$root/claude-tasks' keys-toggle | grep -q '^change-header-label( keys )+change-header:j / k'"
+check "...which lists every key" \
+    bash -c "FZF_HEADER_LABEL= '$root/claude-tasks' keys-toggle | grep -q '^q / Esc  quit'"
+check "? again goes back to the short header" \
+    test "$(FZF_HEADER_LABEL=" keys " "$root/claude-tasks" keys-toggle)" = "change-header-label()+change-header:Enter jump · dd clear · ? more"
+
 echo
 ((failures == 0)) && echo "all passed" || { echo "$failures failed"; exit 1; }

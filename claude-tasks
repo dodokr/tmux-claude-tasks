@@ -210,15 +210,48 @@ jump() {
     tmux switch-client -t "$1" \; select-window -t "$1" \; select-pane -t "$1"
 }
 
+# The picker's header: a short line, and the full key list that "?" swaps in. One source
+# for ui and keys-toggle. Prints "short<US>full" (US = \x1f).
+help_text() {
+    local rows=("j / k|move" "g / G|top / bottom" "Enter|jump to the pane" "dd|clear the entry"
+        "r|refresh" "/|filter (Esc leaves it)")
+    command -v claude-sessions >/dev/null && rows+=("s|search all past sessions")
+    command -v claude-reports >/dev/null && rows+=("e|reports")
+    rows+=("?|close this help" "q / Esc|quit")
+    local full="" row
+    for row in "${rows[@]}"; do
+        full+="$(printf '%-8s %s' "${row%%|*}" "${row#*|}")"$'\n'
+    done
+    printf '%s\x1f%s' "Enter jump · dd clear · ? more" "${full%$'\n'}"
+}
+
+# fzf action for "?": swap the short header and the full key list. The (invisible, borderless)
+# header label carries the state, because fzf doesn't expose the header text.
+keys_toggle() {
+    local short full
+    IFS=$'\x1f' read -r -d '' short full < <(help_text)
+    if [[ $FZF_HEADER_LABEL == " keys " ]]; then
+        printf 'change-header-label()+change-header:%s' "$short"
+    else
+        printf 'change-header-label( keys )+change-header:%s' "$full"
+    fi
+}
+
 ui() {
     # fzf has no key chords, so "dd" keeps state in the (hidden) prompt: the first
     # d sets it to "d> ", a second d clears the entry, any other key resets it.
-    local keys="j,k,g,G,d,r,q,/" header="j/k move · g/G top/bottom · Enter jump · dd clear · r refresh · / filter · q quit"
+    local keys="j,k,g,G,d,r,q,/,?" header
+    IFS=$'\x1f' read -r -d '' header _ < <(help_text) || true
     local extra=()
     # Optional companion: search all past sessions (github.com/dodokr/tmux-claude-sessions).
     if command -v claude-sessions >/dev/null; then
-        keys+=",s" header="${header/ · q quit/ · s search all · q quit}"
+        keys+=",s"
         extra=(--bind="s:become(claude-sessions)")
+    fi
+    # Optional companion: reports of finished sessions (github.com/dodokr/tmux-claude-reports).
+    if command -v claude-reports >/dev/null; then
+        keys+=",e"
+        extra+=(--bind="e:become(claude-reports)")
     fi
     local reset="change-prompt(> )"
     local normal="rebind($keys)+hide-input+clear-query+$reset"
@@ -232,6 +265,7 @@ ui() {
         --bind="enter:execute-silent($self jump {1})+abort" \
         --bind="d:transform:$dd" \
         --bind="r:reload($self list)+$reset" \
+        --bind="?:transform:$self keys-toggle" \
         --bind="/:show-input+unbind($keys)+$reset" \
         --bind="esc:transform:[[ \$FZF_INPUT_STATE == hidden ]] && echo abort || echo '$normal'" \
         "${extra[@]}"
@@ -242,6 +276,8 @@ case "$1" in
     list) list ;;
     clear) rm -f -- "$state/${2#%}" ;;
     jump) jump "$2" ;;
+    keys-toggle) keys_toggle ;;
+    header) IFS=$'\x1f' read -r -d '' h _ < <(help_text) || true; printf '%s\n' "$h" ;;
     resurrect-save) resurrect_save ;;
     resurrect-restore) resurrect_restore ;;
     "") ui ;;

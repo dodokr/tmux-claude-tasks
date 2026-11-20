@@ -98,6 +98,8 @@ Press your binding (`prefix + C-i` above) to open the picker.
 | `r` | refresh |
 | `/` | filter; `Esc` returns to normal mode |
 | `s` | search all past sessions (only with [tmux-claude-sessions](https://github.com/dodokr/tmux-claude-sessions) installed) |
+| `e` | a report of each session's latest reply, readable in the browser (only with [tmux-claude-reports](https://github.com/dodokr/tmux-claude-reports) installed) |
+| `?` | show all keys (the header shows only the main ones) |
 | `q`, `Esc`, `Ctrl+[` | close |
 
 A `done` entry stays until you remove it with `dd`, or until you send that session a new prompt.
